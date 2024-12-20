@@ -3,9 +3,9 @@ const ChatMessage = ({
     content,
     onSave,
   }: {
-    role: 'user' | 'assistant';
-    content: string;
-    onSave?: () => void; // Opción para guardar en el Notepad
+    role: 'user' | 'assistant'; // Role of the message
+    content: string; // Content of the message
+    onSave?: () => void; // Optional callback to save the message
   }) => {
     const isUser = role === 'user';
     return (

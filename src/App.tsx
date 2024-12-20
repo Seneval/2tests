@@ -15,6 +15,7 @@ const ASSISTANTS = {
 const App = () => {
   const [selectedAssistant, setSelectedAssistant] = useState<keyof typeof ASSISTANTS | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [notepad, setNotepad] = useState<string[]>([]); // State for Notepad
 
   const handleSend = async (message: string) => {
     if (!selectedAssistant) {
@@ -48,6 +49,10 @@ const App = () => {
     }
   };
 
+  const handleSaveToNotepad = (content: string) => {
+    setNotepad((prev) => [...prev, content]); // Add phrase to Notepad
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
       {!selectedAssistant ? (
@@ -66,16 +71,35 @@ const App = () => {
           </div>
         </div>
       ) : (
-        <div className="w-full max-w-2xl bg-white shadow-lg rounded-lg p-6">
+        <div className="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6">
           <h1 className="text-3xl font-bold mb-6 text-center">
             {ASSISTANTS[selectedAssistant]?.name}
           </h1>
           <div className="space-y-4 mb-4 overflow-y-auto max-h-[60vh]">
             {messages.map((msg, idx) => (
-              <ChatMessage key={idx} role={msg.role} content={msg.content} />
+              <ChatMessage
+                key={idx}
+                role={msg.role}
+                content={msg.content}
+                onSave={msg.role === 'assistant' ? () => handleSaveToNotepad(msg.content) : undefined} // Save button for assistant
+              />
             ))}
           </div>
           <ChatInput onSend={handleSend} />
+          <div className="mt-6">
+            <h2 className="text-2xl font-bold">Notepad</h2>
+            <div className="mt-4 border p-4 rounded bg-gray-50 max-h-[200px] overflow-y-auto">
+              {notepad.length === 0 ? (
+                <p className="text-gray-500">Your notepad is empty. Save phrases to see them here.</p>
+              ) : (
+                <ul className="list-disc pl-5">
+                  {notepad.map((note, idx) => (
+                    <li key={idx} className="mb-2">{note}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>
