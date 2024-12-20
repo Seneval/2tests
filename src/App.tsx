@@ -15,7 +15,8 @@ const ASSISTANTS = {
 const App = () => {
   const [zenbotMessages, setZenbotMessages] = useState<Message[]>([]);
   const [sadbotMessages, setSadbotMessages] = useState<Message[]>([]);
-  const [notepad, setNotepad] = useState<string[]>([]);
+  const [titulos, setTitulos] = useState<string[]>([]); // Zenbot's saved messages
+  const [copy, setCopy] = useState<string[]>([]); // Sadbot's saved messages
 
   const handleSend = async (assistantKey: keyof typeof ASSISTANTS, message: string) => {
     const userMessage: Message = { role: 'user', content: message };
@@ -47,8 +48,12 @@ const App = () => {
     }
   };
 
-  const handleSaveToNotepad = (content: string) => {
-    setNotepad((prev) => [...prev, content]);
+  const handleSaveToNotepad = (assistantKey: keyof typeof ASSISTANTS, content: string) => {
+    if (assistantKey === 'zenbot') {
+      setTitulos((prev) => [...prev, content]); // Save to Titulos
+    } else if (assistantKey === 'sadbot') {
+      setCopy((prev) => [...prev, content]); // Save to Copy
+    }
   };
 
   return (
@@ -63,7 +68,7 @@ const App = () => {
                 key={idx}
                 role={msg.role}
                 content={msg.content}
-                onSave={msg.role === 'assistant' ? () => handleSaveToNotepad(msg.content) : undefined}
+                onSave={msg.role === 'assistant' ? () => handleSaveToNotepad('zenbot', msg.content) : undefined}
               />
             ))}
           </div>
@@ -79,7 +84,7 @@ const App = () => {
                 key={idx}
                 role={msg.role}
                 content={msg.content}
-                onSave={msg.role === 'assistant' ? () => handleSaveToNotepad(msg.content) : undefined}
+                onSave={msg.role === 'assistant' ? () => handleSaveToNotepad('sadbot', msg.content) : undefined}
               />
             ))}
           </div>
@@ -89,17 +94,34 @@ const App = () => {
 
       {/* Notepad */}
       <div className="mt-6 w-full max-w-5xl">
-        <h2 className="text-2xl font-bold">Notepad</h2>
-        <div className="mt-4 border p-4 rounded bg-gray-50 max-h-[200px] overflow-y-auto">
-          {notepad.length === 0 ? (
-            <p className="text-gray-500">Your notepad is empty. Save phrases to see them here.</p>
-          ) : (
-            <ul className="list-disc pl-5">
-              {notepad.map((note, idx) => (
-                <li key={idx} className="mb-2">{note}</li>
-              ))}
-            </ul>
-          )}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold">Titulos</h2>
+          <div className="mt-4 border p-4 rounded bg-gray-50 max-h-[200px] overflow-y-auto">
+            {titulos.length === 0 ? (
+              <p className="text-gray-500">No titles saved. Save something from Zenbot!</p>
+            ) : (
+              <ul className="list-disc pl-5">
+                {titulos.map((title, idx) => (
+                  <li key={idx} className="mb-2">{title}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-2xl font-bold">Copy</h2>
+          <div className="mt-4 border p-4 rounded bg-gray-50 max-h-[200px] overflow-y-auto">
+            {copy.length === 0 ? (
+              <p className="text-gray-500">No copies saved. Save something from Sadbot!</p>
+            ) : (
+              <ul className="list-disc pl-5">
+                {copy.map((copyText, idx) => (
+                  <li key={idx} className="mb-2">{copyText}</li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
     </div>
