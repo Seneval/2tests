@@ -100,7 +100,82 @@ const App = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
-      {/* Same as before */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
+        {/* Zenbot */}
+        <div className="bg-white shadow-lg rounded-lg p-6">
+          <h1 className="text-3xl font-bold mb-6 text-center">{ASSISTANTS.zenbot.name}</h1>
+          <div className="space-y-4 mb-4 overflow-y-auto max-h-[40vh]">
+            {zenbotMessages.map((msg, idx) => (
+              <ChatMessage
+                key={idx}
+                role={msg.role}
+                content={msg.content}
+                onSave={msg.role === 'assistant' ? () => handleSaveToNotepad('zenbot', msg.content) : undefined}
+              />
+            ))}
+          </div>
+          <ChatInput onSend={(message) => handleSend('zenbot', message)} />
+        </div>
+
+        {/* Sadbot */}
+        <div className="bg-white shadow-lg rounded-lg p-6">
+          <h1 className="text-3xl font-bold mb-6 text-center">{ASSISTANTS.sadbot.name}</h1>
+          <div className="space-y-4 mb-4 overflow-y-auto max-h-[40vh]">
+            {sadbotMessages.map((msg, idx) => (
+              <ChatMessage
+                key={idx}
+                role={msg.role}
+                content={msg.content}
+                onSave={msg.role === 'assistant' ? () => handleSaveToNotepad('sadbot', msg.content) : undefined}
+              />
+            ))}
+          </div>
+          <ChatInput onSend={(message) => handleSend('sadbot', message)} />
+        </div>
+      </div>
+
+      {/* Image Viewer */}
+      {imageToShow && (
+        <div className="mt-6 w-full max-w-5xl">
+          <h2 className="text-2xl font-bold">Image Viewer</h2>
+          <div className="mt-4 flex justify-center">
+            <img src={imageToShow} alt="Assistant" className="max-w-xs rounded shadow" />
+          </div>
+        </div>
+      )}
+
+      {/* Notepad */}
+      <div className="mt-6 w-full max-w-5xl">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold">Titulos</h2>
+          <div className="mt-4 border p-4 rounded bg-gray-50 max-h-[200px] overflow-y-auto">
+            {titulos.length === 0 ? (
+              <p className="text-gray-500">No titles saved. Save something from Zenbot!</p>
+            ) : (
+              <ul className="list-disc pl-5">
+                {titulos.map((title, idx) => (
+                  <li key={idx} className="mb-2">{title}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-2xl font-bold">Copy</h2>
+          <div className="mt-4 border p-4 rounded bg-gray-50 max-h-[200px] overflow-y-auto">
+            {copy.length === 0 ? (
+              <p className="text-gray-500">No copies saved. Save something from Sadbot!</p>
+            ) : (
+              <ul className="list-disc pl-5">
+                {copy.map((copyText, idx) => (
+                  <li key={idx} className="mb-2">{copyText}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
