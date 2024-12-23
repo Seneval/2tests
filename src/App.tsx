@@ -15,8 +15,9 @@ const ASSISTANTS = {
 const App = () => {
   const [zenbotMessages, setZenbotMessages] = useState<Message[]>([]);
   const [sadbotMessages, setSadbotMessages] = useState<Message[]>([]);
-  const [titulos, setTitulos] = useState<string[]>([]); // Zenbot's saved messages
-  const [copy, setCopy] = useState<string[]>([]); // Sadbot's saved messages
+  const [titulos, setTitulos] = useState<string[]>([]);
+  const [copy, setCopy] = useState<string[]>([]);
+  const [imageToShow, setImageToShow] = useState<string | null>(null); // State for showing images
 
   const handleSend = async (assistantKey: keyof typeof ASSISTANTS, message: string) => {
     const userMessage: Message = { role: 'user', content: message };
@@ -24,6 +25,16 @@ const App = () => {
       assistantKey === 'zenbot' ? setZenbotMessages : setSadbotMessages;
 
     setMessages((prev) => [...prev, userMessage]);
+
+    // Check if the user is requesting an image
+    if (message.toLowerCase().includes('i want an image of zenbot')) {
+      setImageToShow('/images/zenbot.png'); // Show Zenbot image
+      return;
+    }
+    if (message.toLowerCase().includes('i want an image of sadbot')) {
+      setImageToShow('/images/sadbot.png'); // Show Sadbot image
+      return;
+    }
 
     try {
       const res = await fetch('/.netlify/functions/sendMessage', {
@@ -91,6 +102,16 @@ const App = () => {
           <ChatInput onSend={(message) => handleSend('sadbot', message)} />
         </div>
       </div>
+
+      {/* Image Viewer */}
+      {imageToShow && (
+        <div className="mt-6 w-full max-w-5xl">
+          <h2 className="text-2xl font-bold">Image Viewer</h2>
+          <div className="mt-4 flex justify-center">
+            <img src={imageToShow} alt="Assistant" className="max-w-xs rounded shadow" />
+          </div>
+        </div>
+      )}
 
       {/* Notepad */}
       <div className="mt-6 w-full max-w-5xl">
