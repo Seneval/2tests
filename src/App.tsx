@@ -28,11 +28,11 @@ const App = () => {
 
     // Check if the user is requesting an image
     if (message.toLowerCase().includes('i want an image of zenbot')) {
-      setImageToShow('/images/zenbot.png'); // Show Zenbot image
+      setImageToShow('/images/zenbot.jpg'); // Show Zenbot image
       return;
     }
     if (message.toLowerCase().includes('i want an image of sadbot')) {
-      setImageToShow('/images/sadbot.png'); // Show Sadbot image
+      setImageToShow('/images/sadbot.jpg'); // Show Sadbot image all up in dis bich
       return;
     }
 
