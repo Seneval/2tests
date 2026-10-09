@@ -514,7 +514,8 @@ body.render{padding:0;background:#000}
   <button id="fwd" title="Siguiente capítulo">⏭</button>
   <div id="prog"><div id="bar"></div></div>
   <span id="time">0:00 / 0:00</span>
-  <label class="sw"><input type="checkbox" id="voice"> Narración por voz (navegador)</label>
+  <label class="sw"><input type="checkbox" id="voice" checked> Narración <span id="voicekind">(cargando…)</span></label>
+  <audio id="nar" preload="auto"></audio>
   <button id="full">⛶ Pantalla completa</button>
 </div>
 <div id="chaps"></div>
@@ -539,10 +540,18 @@ body.render{padding:0;background:#000}
   let t=0,playing=false,last=0,cur=-1,lastCap='';
   const fmt=s=>{s=Math.floor(s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
 
-  scenes.forEach((s,k)=>{const b=document.createElement('button');b.textContent=(k+1)+'. '+s.dataset.name;b.onclick=()=>{render(starts[k]);};chaps.appendChild(b);});
+  scenes.forEach((s,k)=>{const b=document.createElement('button');b.textContent=(k+1)+'. '+s.dataset.name;b.onclick=()=>{render(starts[k]);narSync(true);};chaps.appendChild(b);});
 
+  // narración: pista grabada si existe junto al HTML; si no, voz del navegador
+  const nar=document.getElementById('nar'),voiceBox=document.getElementById('voice'),voiceKind=document.getElementById('voicekind');
+  let narOK=false;
+  nar.addEventListener('loadedmetadata',()=>{narOK=true;voiceKind.textContent='(voz grabada)';});
+  nar.addEventListener('error',()=>{narOK=false;voiceKind.textContent=('speechSynthesis' in window)?'(voz del navegador)':'(no disponible)';});
+  if(!RENDER) nar.src='cs-career-narration.mp3';
+  function narSync(force){ if(!narOK||!voiceBox.checked) return; if(force||Math.abs(nar.currentTime-t)>0.35) nar.currentTime=t; if(playing&&nar.paused) nar.play().catch(()=>{}); }
+  function narStop(){ if(narOK) nar.pause(); if('speechSynthesis' in window) speechSynthesis.cancel(); }
   function speak(txt){
-    if(!document.getElementById('voice').checked||!('speechSynthesis' in window)) return;
+    if(narOK||!voiceBox.checked||!('speechSynthesis' in window)) return;
     try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang='es-MX';u.rate=1.05;
       const v=speechSynthesis.getVoices().find(v=>/^es[-_]?(MX|419|US)/i.test(v.lang))||speechSynthesis.getVoices().find(v=>/^es/i.test(v.lang));
       if(v)u.voice=v;speechSynthesis.speak(u);}catch(e){}
@@ -553,6 +562,7 @@ body.render{padding:0;background:#000}
     let i=durs.length-1;for(let k=0;k<durs.length;k++){if(t<starts[k]+durs[k]){i=k;break;}}
     if(i!==cur){scenes.forEach((s,k)=>s.classList.toggle('active',k===i));cur=i;[...chaps.children].forEach((b,k)=>b.classList.toggle('on',k===i));}
     const lt=t-starts[i];
+    if(playing) narSync(false);
     for(const a of scenes[i].getAnimations({subtree:true})){a.currentTime=lt*1000;}
     const caps=[...scenes[i].querySelectorAll('.caps p')];let c=null;for(const p of caps){if(+p.dataset.at<=lt)c=p;}
     const txt=c?c.textContent:'';
@@ -563,20 +573,20 @@ body.render{padding:0;background:#000}
   function loop(now){
     if(!playing)return;
     const dt=Math.min(.1,(now-last)/1000);last=now;render(t+dt);
-    if(t>=TOTAL){playing=false;playBtn.textContent='↺ Repetir';speechSynthesis&&speechSynthesis.cancel();return;}
+    if(t>=TOTAL){playing=false;playBtn.textContent='↺ Repetir';narStop();return;}
     requestAnimationFrame(loop);
   }
-  function play(){if(t>=TOTAL)t=0;playing=true;last=performance.now();playBtn.textContent='❚❚ Pausa';requestAnimationFrame(loop);}
-  function pause(){playing=false;playBtn.textContent='▶ Reproducir';if('speechSynthesis' in window)speechSynthesis.cancel();}
+  function play(){if(t>=TOTAL)t=0;playing=true;last=performance.now();playBtn.textContent='❚❚ Pausa';narSync(true);requestAnimationFrame(loop);}
+  function pause(){playing=false;playBtn.textContent='▶ Reproducir';narStop();}
   playBtn.onclick=()=>playing?pause():play();
-  document.getElementById('back').onclick=()=>{const i=cur>0&&(t-starts[cur])<2?cur-1:cur;render(starts[i]);};
-  document.getElementById('fwd').onclick=()=>{render(cur<scenes.length-1?starts[cur+1]:TOTAL);};
-  document.getElementById('prog').onclick=e=>{const r=e.currentTarget.getBoundingClientRect();render((e.clientX-r.left)/r.width*TOTAL);};
+  document.getElementById('back').onclick=()=>{const i=cur>0&&(t-starts[cur])<2?cur-1:cur;render(starts[i]);narSync(true);};
+  document.getElementById('fwd').onclick=()=>{render(cur<scenes.length-1?starts[cur+1]:TOTAL);narSync(true);};
+  document.getElementById('prog').onclick=e=>{const r=e.currentTarget.getBoundingClientRect();render((e.clientX-r.left)/r.width*TOTAL);narSync(true);};
   document.getElementById('full').onclick=()=>{(document.documentElement.requestFullscreen||function(){}).call(document.documentElement);};
-  document.getElementById('voice').onchange=e=>{if(!e.target.checked&&'speechSynthesis' in window)speechSynthesis.cancel();};
+  voiceBox.onchange=e=>{if(!e.target.checked)narStop();else narSync(true);};
   document.addEventListener('keydown',e=>{
     if(e.code==='Space'){e.preventDefault();playing?pause():play();}
-    else if(e.code==='ArrowRight'){render(t+5);} else if(e.code==='ArrowLeft'){render(t-5);}
+    else if(e.code==='ArrowRight'){render(t+5);narSync(true);} else if(e.code==='ArrowLeft'){render(t-5);narSync(true);}
   });
   function fit(){
     if(RENDER){document.getElementById('wrap').style.transform='none';return;}

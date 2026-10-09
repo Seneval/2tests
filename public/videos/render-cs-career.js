@@ -1,5 +1,6 @@
 const { chromium } = require('playwright-core');
-const { spawn } = require('child_process');
+const { spawn, execFileSync } = require('child_process');
+const fs = require('fs');
 const path = require('path');
 const mode = process.argv[2] || 'preview';
 const src = 'file://' + path.resolve(process.argv[3]);
@@ -30,6 +31,12 @@ const FPS = 24;
     }
     ff.stdin.end();
     await new Promise(r => ff.on('close', r));
+    const nar = path.join(path.dirname(path.resolve(process.argv[3])), 'cs-career-narration.mp3');
+    if (fs.existsSync(nar)) {
+      const tmp = out + '.silent.mp4'; fs.renameSync(out, tmp);
+      execFileSync('ffmpeg', ['-y', '-v', 'error', '-i', tmp, '-i', nar, '-c:v', 'copy', '-c:a', 'aac', '-b:a', '128k', '-shortest', '-movflags', '+faststart', out]);
+      fs.unlinkSync(tmp); console.log('audio muxed from', nar);
+    }
     console.log('done', out);
   }
   await browser.close();
