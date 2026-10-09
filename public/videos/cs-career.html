@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Computer Science 2026</title>
+<meta name="description" content="Video animado: el campo de Computer Science, la carrera ISC/ITC del Tec semestre a semestre, posgrado, tipos de tesis y el camino de vibecoder a programador serio en la era de la IA.">
+<style>
+:root{
+  --bg:#0b1020; --bg2:#121a33; --ink:#eef2ff; --mute:#9aa7c7; --line:#273354;
+  --c1:#22d3ee; --c2:#a78bfa; --c3:#fbbf24; --c4:#34d399; --c5:#fb7185;
+  --cap-bg:rgba(8,12,26,.82);
+}
+:root[data-theme="light"]{ --bg:#0b1020; } /* el video siempre es oscuro: es una pieza de estudio */
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#05070f;color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Inter,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:12px;padding:12px 16px}
+#wrap{position:relative;width:1280px;height:720px;transform-origin:top left}
+#stage{position:absolute;inset:0;width:1280px;height:720px;overflow:hidden;border-radius:18px;background:
+  radial-gradient(1200px 600px at 20% -10%,#1b2a5a 0%,transparent 60%),
+  radial-gradient(900px 500px at 110% 110%,#2a1b5a 0%,transparent 55%),
+  linear-gradient(180deg,var(--bg),#070b18);
+  box-shadow:0 30px 80px rgba(0,0,0,.6)}
+#stage::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:64px 64px;pointer-events:none}
+.scene{position:absolute;inset:0;display:none;padding:46px 72px 120px}
+.caps{display:none}
+.scene.active{display:block;animation:sceneIn .7s ease both}
+.scene,.scene *{animation-play-state:paused!important}
+.scene.active{animation-play-state:paused!important}
+/* HUD dentro del video */
+#hud{position:absolute;top:16px;left:72px;right:72px;display:flex;justify-content:space-between;align-items:center;font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);pointer-events:none}
+#hud b{color:var(--c1);font-weight:600}
+#cap{position:absolute;left:72px;right:72px;bottom:30px;min-height:60px;padding:12px 20px;border-radius:14px;background:var(--cap-bg);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.08);font-size:22px;line-height:1.32;text-align:center;color:#fff;pointer-events:none}
+#cap.show{animation:capIn .35s ease both}
+#cap:empty{opacity:0}
+body.render #cap.show{animation:none}
+
+/* tipografía */
+h1{font-size:72px;line-height:1.02;margin:0;font-weight:800;letter-spacing:-.02em}
+h2{font-size:42px;line-height:1.08;margin:0 0 8px;font-weight:800;letter-spacing:-.02em}
+h3{font-size:26px;margin:0 0 10px;font-weight:700}
+.sub{font-size:23px;color:var(--mute);margin:10px 0 0;font-weight:500}
+.tag{display:inline-block;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--c1);font-size:14px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;margin-bottom:14px}
+.c1{color:var(--c1)}.c2{color:var(--c2)}.c3{color:var(--c3)}.c4{color:var(--c4)}.c5{color:var(--c5)}
+
+/* animaciones base */
+.a-up{animation:up .8s cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--d,0s)}
+.a-pop{animation:pop .7s cubic-bezier(.2,1.4,.3,1) both;animation-delay:var(--d,0s)}
+.a-fade{animation:fade .8s ease both;animation-delay:var(--d,0s)}
+.a-left{animation:left .8s cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--d,0s)}
+.a-draw{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.2s ease both;animation-delay:var(--d,0s)}
+.a-grow{transform-origin:left center;animation:grow 1s cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--d,0s)}
+.a-rise{transform-origin:bottom center;animation:rise 1s cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--d,0s)}
+.a-float{animation:float 4s ease-in-out infinite;animation-delay:var(--d,0s)}
+.a-pulse{animation:pulse 2.4s ease-in-out infinite;animation-delay:var(--d,0s)}
+.a-type{display:inline-block;overflow:hidden;white-space:nowrap;border-right:3px solid var(--c1);animation:type 2.2s steps(34,end) both,blink .8s step-end infinite;animation-delay:var(--d,0s),0s;width:0}
+@keyframes sceneIn{from{opacity:0}to{opacity:1}}
+@keyframes capIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes up{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes left{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:scale(1)}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes rise{from{transform:scaleY(0);opacity:.3}to{transform:scaleY(1);opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+@keyframes type{from{width:0}to{width:100%}}
+@keyframes blink{50%{border-color:transparent}}
+
+/* componentes */
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:14px}
+.sem{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.sem h3{display:flex;align-items:center;gap:10px;font-size:23px;margin-bottom:8px}
+.sem h3 .n{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:10px;background:var(--c1);color:#041018;font-weight:800;font-size:20px}
+.sem ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+.sem li{font-size:17px;line-height:1.22;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.06);border-left:4px solid var(--c2)}
+.sem.enf li{border-left-color:var(--c3)}.sem.enf h3 .n{background:var(--c3)}
+.sem.esp li{border-left-color:var(--c4)}.sem.esp h3 .n{background:var(--c4)}
+.sem li.note{background:transparent;border-left-color:transparent;color:var(--mute);font-size:16px;padding-top:2px}
+.stages{display:flex;gap:10px;margin-top:22px}
+.stage-seg{flex:1;height:68px;border-radius:14px;display:grid;place-items:center;font-size:24px;font-weight:800;color:#06101d;position:relative}
+.stage-seg small{display:block;font-size:14px;font-weight:600;letter-spacing:.1em;opacity:.8;text-align:center}
+.semrow{display:grid;grid-template-columns:repeat(8,1fr);gap:10px;margin-top:12px}
+.semrow div{height:42px;border-radius:10px;border:1px solid var(--line);display:grid;place-items:center;font-size:20px;font-weight:700;color:var(--mute);background:rgba(255,255,255,.04)}
+.check{display:flex;align-items:flex-start;gap:14px;padding:8px 12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line);font-size:18px;line-height:1.28}
+.check svg{flex:0 0 30px;width:30px;height:30px;margin-top:1px}
+.check b{color:#fff}
+.list{display:flex;flex-direction:column;gap:7px;margin-top:14px}
+.two{display:grid;grid-template-columns:1.15fr 1fr;gap:28px;align-items:start}
+.card{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:18px;padding:18px 20px}
+.card h3{font-size:22px;margin-bottom:6px}
+.card p{margin:4px 0 0;color:var(--mute);font-size:17.5px;line-height:1.33}
+.card.thesis{min-height:0}
+.card .k{display:inline-block;width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:20px;font-weight:800;color:#06101d;margin-bottom:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.lvl{position:absolute;right:72px;top:40px;width:104px;height:104px;border-radius:50%;display:grid;place-items:center;text-align:center;font-weight:800;border:4px solid var(--c1);color:var(--c1);font-size:11px;letter-spacing:.06em;text-transform:uppercase;line-height:1.1;font-size:10px}
+.lvl b{display:block;font-size:34px;letter-spacing:0;line-height:1}
+.quote{font-size:34px;line-height:1.3;font-weight:600;max-width:1000px}
+.pill{display:inline-block;padding:6px 14px;border-radius:999px;font-size:17px;font-weight:700;background:rgba(255,255,255,.08);border:1px solid var(--line);margin:6px 8px 0 0}
+.big{font-size:120px;font-weight:900;letter-spacing:-.04em;line-height:1}
+.vs{display:grid;grid-template-columns:1fr 90px 1fr;gap:20px;align-items:center;margin-top:30px}
+.bubble{background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:16px;padding:12px 16px;font-size:20px;line-height:1.3;margin-top:10px}
+.bubble.me{background:rgba(34,211,238,.12);border-color:rgba(34,211,238,.4)}
+.bubble.bad{background:rgba(251,113,133,.12);border-color:rgba(251,113,133,.4)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:17px;background:#070b18;border:1px solid var(--line);border-radius:12px;padding:16px 18px;line-height:1.5;color:#dbeafe}
+.mono .g{color:#86efac}.mono .y{color:#fde68a}.mono .p{color:#c4b5fd}.mono .m{color:#64748b}
+
+/* controles (fuera del video) */
+#ctl{width:min(1280px,100%);display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;color:var(--mute);font-size:14px}
+#ctl button{background:#151c33;color:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:14px;cursor:pointer;font-weight:600}
+#ctl button:hover{background:#1c2546}
+#play{min-width:110px}
+#prog{flex:1 1 300px;height:12px;border-radius:999px;background:#151c33;border:1px solid var(--line);cursor:pointer;position:relative;overflow:hidden}
+#bar{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,var(--c1),var(--c2))}
+#chaps{display:flex;flex-wrap:wrap;gap:6px;width:min(1280px,100%)}
+#chaps button{background:transparent;border:1px solid var(--line);color:var(--mute);border-radius:8px;padding:5px 9px;font-size:12px;cursor:pointer}
+#chaps button.on{color:#fff;border-color:var(--c1);background:rgba(34,211,238,.12)}
+label.sw{display:flex;align-items:center;gap:6px;cursor:pointer}
+body.render #ctl,body.render #chaps{display:none}
+body.render{padding:0;background:#000}
+@media (max-width:700px){#cap{font-size:22px}}
+</style>
+</head>
+<body>
+<div id="wrap">
+<div id="stage">
+  <div id="hud"><span>Computer Science · 2026</span><span id="chap"></span></div>
+
+  <!-- 1 INTRO -->
+  <section class="scene" data-dur="14" data-name="Intro">
+    <div style="padding-top:80px">
+      <div class="tag a-up">Video explicativo · 9 de octubre de 2026</div>
+      <h1><span class="a-up" style="--d:.3s;display:block">Computer Science:</span><span class="a-up c1" style="--d:.9s;display:block">el campo, la carrera</span><span class="a-up" style="--d:1.5s;display:block">y tu camino en la era de la IA</span></h1>
+      <p class="sub a-up" style="--d:2.3s">Del plan de estudios del Tec (ISC → ITC) al doctorado, los tipos de tesis y qué necesitas saber para pasar de <i>vibecoder</i> a programador serio.</p>
+      <div class="a-up" style="--d:3.2s;margin-top:30px"><span class="pill c1">14 capítulos</span><span class="pill c2">~7 minutos</span><span class="pill c3">Subtítulos + narración opcional</span></div>
+    </div>
+    <div class="caps">
+      <p data-at="0.5">Hoy vamos a recorrer Computer Science completo: qué es el campo, qué aprende alguien que entra a la carrera del Tec hoy, qué sigue después, y qué necesitas tú si no vas a cursarla.</p>
+      <p data-at="8">Toma nota: al final hay un plan concreto a tres años.</p>
+    </div>
+  </section>
+
+  <!-- 2 EL CAMPO -->
+  <section class="scene" data-dur="32" data-name="El campo">
+    <div class="tag a-up">¿Qué es Computer Science?</div>
+    <h2 class="a-up" style="--d:.2s">No es "saber programar". Es la ciencia de <span class="c1">qué se puede computar</span> y cómo hacerlo bien.</h2>
+    <svg viewBox="0 0 1136 440" width="955" height="370" style="margin:2px auto 0;display:block;overflow:visible" font-family="inherit">
+      <defs><filter id="glow"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g stroke="#3b4a7a" stroke-width="2.5" fill="none">
+        <path pathLength="1" class="a-draw" style="--d:1.2s" d="M568 220 L150 110"/>
+        <path pathLength="1" class="a-draw" style="--d:1.5s" d="M568 220 L380 60"/>
+        <path pathLength="1" class="a-draw" style="--d:1.8s" d="M568 220 L756 60"/>
+        <path pathLength="1" class="a-draw" style="--d:2.1s" d="M568 220 L986 110"/>
+        <path pathLength="1" class="a-draw" style="--d:2.4s" d="M568 220 L986 340"/>
+        <path pathLength="1" class="a-draw" style="--d:2.7s" d="M568 220 L756 390"/>
+        <path pathLength="1" class="a-draw" style="--d:3.0s" d="M568 220 L380 390"/>
+        <path pathLength="1" class="a-draw" style="--d:3.3s" d="M568 220 L150 340"/>
+      </g>
+      <g class="a-pop" style="--d:.6s;transform-box:fill-box;transform-origin:center">
+        <circle cx="568" cy="220" r="78" fill="#0e1630" stroke="#22d3ee" stroke-width="3" filter="url(#glow)"/>
+        <text x="568" y="212" text-anchor="middle" fill="#fff" font-size="22" font-weight="800">Computer</text>
+        <text x="568" y="240" text-anchor="middle" fill="#fff" font-size="22" font-weight="800">Science</text>
+      </g>
+      <g font-size="17" font-weight="700" fill="#fff" text-anchor="middle">
+        <g class="a-pop" style="--d:1.6s;transform-box:fill-box;transform-origin:center"><rect x="50" y="80" width="200" height="60" rx="14" fill="#1a2446" stroke="#a78bfa" stroke-width="2"/><text x="150" y="106">Teoría y algoritmos</text><text x="150" y="128" font-size="12" fill="#9aa7c7" font-weight="500">complejidad · computabilidad</text></g>
+        <g class="a-pop" style="--d:1.9s;transform-box:fill-box;transform-origin:center"><rect x="280" y="30" width="200" height="60" rx="14" fill="#1a2446" stroke="#a78bfa" stroke-width="2"/><text x="380" y="56">Sistemas</text><text x="380" y="78" font-size="12" fill="#9aa7c7" font-weight="500">SO · arquitectura · compiladores</text></g>
+        <g class="a-pop" style="--d:2.2s;transform-box:fill-box;transform-origin:center"><rect x="656" y="30" width="200" height="60" rx="14" fill="#1a2446" stroke="#fbbf24" stroke-width="2"/><text x="756" y="56">Ingeniería de software</text><text x="756" y="78" font-size="12" fill="#9aa7c7" font-weight="500">diseño · pruebas · entrega</text></g>
+        <g class="a-pop" style="--d:2.5s;transform-box:fill-box;transform-origin:center"><rect x="886" y="80" width="200" height="60" rx="14" fill="#1a2446" stroke="#fbbf24" stroke-width="2"/><text x="986" y="106">Redes y seguridad</text><text x="986" y="128" font-size="12" fill="#9aa7c7" font-weight="500">protocolos · cripto · defensa</text></g>
+        <g class="a-pop" style="--d:2.8s;transform-box:fill-box;transform-origin:center"><rect x="886" y="310" width="200" height="60" rx="14" fill="#1a2446" stroke="#34d399" stroke-width="2"/><text x="986" y="336">Inteligencia artificial</text><text x="986" y="358" font-size="12" fill="#9aa7c7" font-weight="500">ML · LLMs · agentes</text></g>
+        <g class="a-pop" style="--d:3.1s;transform-box:fill-box;transform-origin:center"><rect x="656" y="360" width="200" height="60" rx="14" fill="#1a2446" stroke="#34d399" stroke-width="2"/><text x="756" y="386">Datos</text><text x="756" y="408" font-size="12" fill="#9aa7c7" font-weight="500">bases de datos · ciencia de datos</text></g>
+        <g class="a-pop" style="--d:3.4s;transform-box:fill-box;transform-origin:center"><rect x="280" y="360" width="200" height="60" rx="14" fill="#1a2446" stroke="#fb7185" stroke-width="2"/><text x="380" y="386">Gráficas y HCI</text><text x="380" y="408" font-size="12" fill="#9aa7c7" font-weight="500">videojuegos · interfaces · XR</text></g>
+        <g class="a-pop" style="--d:3.7s;transform-box:fill-box;transform-origin:center"><rect x="50" y="310" width="200" height="60" rx="14" fill="#1a2446" stroke="#fb7185" stroke-width="2"/><text x="150" y="336">Matemáticas aplicadas</text><text x="150" y="358" font-size="12" fill="#9aa7c7" font-weight="500">discretas · probabilidad · lineal</text></g>
+      </g>
+    </svg>
+    <div class="caps">
+      <p data-at="0.5">Computer Science es la ciencia de qué problemas se pueden resolver con cómputo, con qué costo, y cómo construir sistemas que lo hagan de forma confiable.</p>
+      <p data-at="9">Programar es solo la herramienta. El campo tiene ramas: teoría y algoritmos, sistemas, ingeniería de software, redes y seguridad, inteligencia artificial, datos, gráficas e interacción, y las matemáticas que lo sostienen.</p>
+      <p data-at="21">Una carrera universitaria te hace tocar todas estas ramas, aunque después te especialices en una o dos.</p>
+    </div>
+  </section>
+
+  <!-- 3 LA CARRERA EN EL TEC -->
+  <section class="scene" data-dur="30" data-name="La carrera">
+    <div class="tag a-up">La carrera en el Tec de Monterrey</div>
+    <h2 class="a-up" style="--d:.2s">ISC se convirtió en <span class="c1">ITC</span>: Ingeniería en Tecnologías Computacionales (modelo Tec21)</h2>
+    <p class="sub a-up" style="--d:.8s">8 semestres · 3 etapas · retos con empresas reales · Semanas Tec · un Semestre Tec de especialización.</p>
+    <div class="stages">
+      <div class="stage-seg a-grow" style="--d:1.6s;background:var(--c2)">Exploración<small>Semestres 1 – 3</small></div>
+      <div class="stage-seg a-grow" style="--d:2.4s;background:var(--c3)">Enfoque<small>Semestres 4 – 6</small></div>
+      <div class="stage-seg a-grow" style="--d:3.2s;background:var(--c4)">Especialización<small>Semestres 7 – 8</small></div>
+    </div>
+    <div class="semrow stagger" data-stagger="4,0.18" data-anim="pop">
+      <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div class="card a-up" style="--d:6s"><h3 class="c2">Cómo se aprende</h3><p>Bloques por reto: un problema real de una organización, varias materias integradas, evaluación por competencias. Menos examen, más "demuéstralo".</p></div>
+      <div class="card a-up" style="--d:6.8s"><h3 class="c4">Qué titula</h3><p>Competencias de todas las unidades de formación, Semestre Tec, servicio social, inglés y proyecto integrador. Sin tesis obligatoria.</p></div>
+    </div>
+    <div class="caps">
+      <p data-at="0.5">Si entraras hoy al Tec, la carrera que antes se llamaba ISC, Ingeniero en Sistemas Computacionales, ahora se llama ITC, Ingeniería en Tecnologías Computacionales, dentro del modelo Tec21.</p>
+      <p data-at="11">Son ocho semestres divididos en tres etapas: exploración, enfoque y especialización. Se aprende resolviendo retos con organizaciones reales, en bloques que integran varias materias.</p>
+      <p data-at="22">Importante: en licenciatura el Tec no exige tesis. Se titula por competencias y proyecto integrador.</p>
+    </div>
+  </section>
+
+  <!-- 4 EXPLORACIÓN -->
+  <section class="scene" data-dur="36" data-name="Semestres 1–3">
+    <div class="tag a-up">Etapa de Exploración</div>
+    <h2 class="a-up" style="--d:.2s">Semestres 1 a 3: <span class="c2">fundamentos que no se negocian</span></h2>
+    <div class="cols">
+      <div class="sem a-up" style="--d:.6s"><h3><span class="n">1</span>Primer semestre</h3>
+        <ul class="stagger" data-stagger="1.2,0.35" data-anim="left">
+          <li>Pensamiento computacional y programación</li>
+          <li>Modelación matemática fundamental (cálculo)</li>
+          <li>Modelación computacional del movimiento (física + código)</li>
+          <li>Modelación de la ingeniería y ciencias</li>
+          <li>Semana Tec: comunicación, ética, liderazgo</li>
+        </ul></div>
+      <div class="sem a-up" style="--d:3s"><h3><span class="n">2</span>Segundo semestre</h3>
+        <ul class="stagger" data-stagger="3.6,0.35" data-anim="left">
+          <li>Programación orientada a objetos</li>
+          <li>Modelación matemática intermedia</li>
+          <li>Análisis estadístico y manejo de datos</li>
+          <li>Modelación computacional de sistemas eléctricos</li>
+          <li>Inglés académico · humanidades</li>
+        </ul></div>
+      <div class="sem a-up" style="--d:5.4s"><h3><span class="n">3</span>Tercer semestre</h3>
+        <ul class="stagger" data-stagger="6,0.35" data-anim="left">
+          <li>Estructuras de datos y algoritmos fundamentales</li>
+          <li>Sistemas mínimos y arquitecturas computacionales</li>
+          <li>Análisis de ecuaciones diferenciales</li>
+          <li>Implementación de Internet de las Cosas (IoT)</li>
+          <li>Análisis de requerimientos de software</li>
+          <li class="note">Bloque optativo de exploración disciplinar</li>
+        </ul></div>
+    </div>
+    <div class="caps">
+      <p data-at="0.5">La etapa de exploración es matemáticas y programación desde cero, pero con contexto físico: modelar movimiento o circuitos con código.</p>
+      <p data-at="9">Primer semestre: pensamiento computacional, cálculo y modelación. Segundo: orientación a objetos, estadística y matemáticas intermedias.</p>
+      <p data-at="18">Tercero es el que separa: estructuras de datos y algoritmos, cómo funciona la máquina por dentro, ecuaciones diferenciales y el primer contacto con requerimientos de software.</p>
+      <p data-at="29">Los nombres exactos cambian por generación y campus, pero la estructura es esta.</p>
+    </div>
+  </section>
+
+  <!-- 5 ENFOQUE -->
+  <section class="scene" data-dur="36" data-name="Semestres 4–6">
+    <div class="tag a-up">Etapa de Enfoque</div>
+    <h2 class="a-up" style="--d:.2s">Semestres 4 a 6: <span class="c3">de programar a construir sistemas</span></h2>
+    <div class="cols">
+      <div class="sem enf a-up" style="--d:.6s"><h3><span class="n">4</span>Cuarto semestre</h3>
+        <ul class="stagger" data-stagger="1.2,0.35" data-anim="left">
+          <li>Análisis y diseño de algoritmos avanzados</li>
+          <li>Matemáticas discretas</li>
+          <li>Bases de datos (modelado, SQL, transacciones)</li>
+          <li>Construcción de software y toma de decisiones</li>
+          <li>Redes computacionales</li>
+        </ul></div>
+      <div class="sem enf a-up" style="--d:3s"><h3><span class="n">5</span>Quinto semestre</h3>
+        <ul class="stagger" data-stagger="3.6,0.35" data-anim="left">
+          <li>Diseño y arquitectura de software</li>
+          <li>Sistemas operativos y concurrencia</li>
+          <li>Modelación del aprendizaje con inteligencia artificial</li>
+          <li>Cómputo en la nube e implementación de redes</li>
+          <li>Desarrollo web y aplicaciones avanzadas</li>
+        </ul></div>
+      <div class="sem enf a-up" style="--d:5.4s"><h3><span class="n">6</span>Sexto semestre</h3>
+        <ul class="stagger" data-stagger="6,0.35" data-anim="left">
+          <li>Inteligencia artificial avanzada y ciencia de datos</li>
+          <li>Implementación de métodos computacionales (compiladores)</li>
+          <li>Gráficas computacionales</li>
+          <li>Seguridad informática</li>
+          <li>Administración de proyectos de software</li>
+        </ul></div>
+    </div>
+    <div class="caps">
+      <p data-at="0.5">En la etapa de enfoque confirmas la carrera y aparece la ingeniería de verdad: algoritmos avanzados, matemáticas discretas, bases de datos y redes.</p>
+      <p data-at="10">Quinto semestre: arquitectura de software, sistemas operativos, nube, y el primer curso formal de aprendizaje automático.</p>
+      <p data-at="19">Sexto: IA avanzada, compiladores, gráficas, seguridad informática y gestión de proyectos. Aquí ya construyes sistemas completos en equipo, con cliente real.</p>
+      <p data-at="29">Fíjate en el patrón: cada semestre agrega una capa debajo de la anterior.</p>
+    </div>
+  </section>
+
+  <!-- 6 ESPECIALIZACIÓN -->
+  <section class="scene" data-dur="28" data-name="Semestres 7–8">
+    <div class="tag a-up">Etapa de Especialización</div>
+    <h2 class="a-up" style="--d:.2s">Semestres 7 y 8: <span class="c4">Semestre Tec y proyecto integrador</span></h2>
+    <div class="two" style="margin-top:20px">
+      <div class="sem esp a-up" style="--d:.6s"><h3><span class="n">7</span>Semestre Tec (eliges)</h3>
+        <ul class="stagger" data-stagger="1.2,0.4" data-anim="left">
+          <li>Concentración disciplinar: IA avanzada, ciberseguridad, cómputo en la nube, desarrollo de videojuegos, ciencia de datos…</li>
+          <li>Estancia profesional o de investigación (empresa o laboratorio)</li>
+          <li>Semestre internacional (universidad socia)</li>
+          <li>Concentración transversal: emprendimiento, negocios, sustentabilidad…</li>
+        </ul></div>
+      <div class="sem esp a-up" style="--d:3.4s"><h3><span class="n">8</span>Octavo semestre</h3>
+        <ul class="stagger" data-stagger="4,0.4" data-anim="left">
+          <li>Integración de seguridad informática en redes y sistemas</li>
+          <li>Desarrollo de aplicaciones avanzadas: proyecto integrador con socio formador</li>
+          <li>Cierre de competencias y servicio social</li>
+          <li>Titulación por competencias + proyecto (sin tesis)</li>
+        </ul></div>
+    </div>
+    <div class="caps">
+      <p data-at="0.5">La especialización es donde cada estudiante se vuelve distinto. El séptimo es el Semestre Tec: eliges una concentración, una estancia en empresa o laboratorio, o un semestre internacional.</p>
+      <p data-at="12">Octavo cierra con el proyecto integrador: un sistema completo para una organización real, con seguridad integrada, y la titulación por competencias.</p>
+      <p data-at="21">Total: unas cuatro mil horas de formación en cuatro años.</p>
+    </div>
+  </section>
+
+  <!-- 7 POSGRADO -->
+  <section class="scene" data-dur="38" data-name="Maestría y doctorado">
+    <div class="tag a-up">¿Y después? Maestría, doctorado, PhD</div>
+    <h2 class="a-up" style="--d:.2s;font-size:36px">La escalera académica: <span class="c1">cada peldaño cambia la pregunta</span></h2>
+    <div style="display:grid;grid-template-columns:480px 1fr;gap:34px;margin-top:6px;align-items:end">
+      <svg viewBox="0 0 560 395" width="480" height="339" style="overflow:visible">
+        <g font-weight="800" text-anchor="middle">
+          <rect class="a-rise" style="--d:.8s" x="20" y="240" width="160" height="110" rx="12" fill="#a78bfa"/>
+          <text x="100" y="285" fill="#0b1020" font-size="22">Licenciatura</text><text x="100" y="312" fill="#0b1020" font-size="16" font-weight="600">4 – 4.5 años</text>
+          <rect class="a-rise" style="--d:1.6s" x="200" y="160" width="160" height="190" rx="12" fill="#fbbf24"/>
+          <text x="280" y="205" fill="#0b1020" font-size="22">Maestría</text><text x="280" y="232" fill="#0b1020" font-size="16" font-weight="600">1.5 – 2 años</text>
+          <rect class="a-rise" style="--d:2.4s" x="380" y="40" width="160" height="310" rx="12" fill="#34d399"/>
+          <text x="460" y="85" fill="#0b1020" font-size="22">Doctorado</text><text x="460" y="112" fill="#0b1020" font-size="16" font-weight="600">4 – 6 años</text><text x="460" y="138" fill="#0b1020" font-size="16" font-weight="600">= PhD</text>
+        </g>
+        <g fill="#9aa7c7" font-size="14" font-weight="600" text-anchor="middle" class="a-fade" style="--d:3.2s">
+          <text x="100" y="380">"¿Cómo se hace?"</text>
+          <text x="280" y="380">"¿Cómo se hace mejor?"</text>
+          <text x="460" y="380">"¿Qué nadie sabe aún?"</text>
+        </g>
+      </svg>
+      <div class="list">
+        <div class="card a-up" style="--d:3.8s"><h3 class="c3">Maestría: dos sabores</h3><p><b class="c3">Profesionalizante</b> (ej. Inteligencia Artificial Aplicada, Tecnologías de Información): cursos + proyecto, sin investigación. <b class="c3">De investigación</b> (Maestría en Ciencias Computacionales): cursos + tesis con un asesor, antesala del doctorado.</p></div>
+        <div class="card a-up" style="--d:6.5s"><h3 class="c4">Doctorado = PhD</h3><p>En español "doctorado" y en inglés "PhD" (Doctor of Philosophy) son lo mismo: un grado de investigación. Existen además doctorados <i>profesionales</i> (EdD, DBA, DEng) orientados a la práctica, no a producir ciencia nueva.</p></div>
+      </div>
+    </div>
+    <div class="caps">
+      <p data-at="0.5">Después de la ingeniería hay dos peldaños. La maestría dura uno y medio a dos años y viene en dos sabores: profesionalizante, enfocada en aplicar, o de investigación, con tesis y asesor.</p>
+      <p data-at="12">El doctorado es el PhD. Dura cuatro a seis años y su pregunta es distinta: no "cómo se hace", sino "qué no sabe nadie todavía".</p>
+      <p data-at="22">En el Tec existe el Doctorado en Ciencias Computacionales, con líneas como aprendizaje automático, bioinformática, algoritmos bioinspirados y ciencia de datos.</p>
+      <p data-at="31">Un doctorado profesional, como el DBA o el EdD, es otra cosa: práctica avanzada, no ciencia nueva.</p>
+    </div>
+  </section>
+
+  <!-- 8 TIPOS DE TESIS -->
+  <section class="scene" data-dur="40" data-name="Tipos de tesis">
+    <div class="tag a-up">Tipos de tesis</div>
+    <h2 class="a-up" style="--d:.2s;font-size:34px">Una tesis es una <span class="c2">contribución defendible</span>. Cuatro formas comunes:</h2>
+    <div class="grid2" style="grid-template-columns:repeat(4,1fr);gap:16px">
+      <div class="card thesis a-up" style="--d:.9s"><span class="k" style="background:var(--c2)">1</span><h3>Monográfica</h3><p>Un solo documento con capítulos: intro, estado del arte, método, resultados. La clásica.</p></div>
+      <div class="card thesis a-up" style="--d:1.8s"><span class="k" style="background:var(--c3)">2</span><h3>Por artículos</h3><p>Varios artículos publicados, unidos por capítulos de integración. La común en doctorado.</p></div>
+      <div class="card thesis a-up" style="--d:2.7s"><span class="k" style="background:var(--c4)">3</span><h3>De proyecto / aplicada</h3><p>Construyes un sistema, lo evalúas con rigor y lo documentas. Típica en maestrías aplicadas.</p></div>
+      <div class="card thesis a-up" style="--d:3.6s"><span class="k" style="background:var(--c5)">4</span><h3>Teórica</h3><p>Demuestras algo: un teorema, una cota, un modelo formal. Poca experimentación, mucha matemática.</p></div>
+    </div>
+    <div class="card a-up" style="--d:5s;margin-top:14px"><h3 class="c1" style="margin-bottom:2px">El camino del doctorado</h3>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:4px;white-space:nowrap" class="stagger" data-stagger="5.6,0.45" data-anim="pop">
+        <span class="pill" style="font-size:15px;padding:5px 11px;margin:0">Cursos (1 año)</span><span class="c3">→</span><span class="pill" style="font-size:15px;padding:5px 11px;margin:0">Examen de candidatura</span><span class="c3">→</span><span class="pill" style="font-size:15px;padding:5px 11px;margin:0">Propuesta</span><span class="c3">→</span><span class="pill" style="font-size:15px;padding:5px 11px;margin:0">Investigar y publicar</span><span class="c3">→</span><span class="pill" style="font-size:15px;padding:5px 11px;margin:0">Escribir la tesis</span><span class="c3">→</span><span class="pill c4" style="font-size:15px;padding:5px 11px;margin:0">Defensa pública</span>
+      </div>
+      <p style="margin-top:8px;font-size:16px">Otras vías de titulación en licenciatura: proyecto integrador, examen general (EGEL), experiencia profesional o posgrado.</p>
+    </div>
+    <div class="caps">
+      <p data-at="0.5">Una tesis no es un libro largo. Es una contribución que puedes defender frente a expertos. Y hay cuatro formas habituales de hacerla.</p>
+      <p data-at="9">Monográfica: un solo documento con capítulos. Por artículos: juntas publicaciones y las integras, lo normal en doctorado. De proyecto: construyes algo y lo evalúas. Teórica: demuestras algo con matemáticas.</p>
+      <p data-at="22">El doctorado sigue un camino fijo: cursos, examen de candidatura, propuesta, años de investigación y publicación, escribir la tesis, y la defensa pública.</p>
+      <p data-at="32">Y recuerda: en licenciatura puedes titularte sin tesis, por proyecto, examen o experiencia.</p>
+    </div>
+  </section>
+
+  <!-- 9 TRANSICIÓN -->
+  <section class="scene" data-dur="18" data-name="Vibecoder → ingeniero">
+    <div class="tag a-up">Y ahora tú</div>
+    <h2 class="a-up" style="--d:.2s">De <span class="c5">vibecoder</span> a <span class="c1">programador de la era de la IA</span></h2>
+    <div class="vs">
+      <div class="card a-left" style="--d:.9s"><h3 class="c5">Vibecoder</h3>
+        <div class="bubble bad">"haz que funcione, pls"</div>
+        <div class="bubble bad">"ahora se rompió, arréglalo"</div>
+        <p>Produce código que no puede leer, depurar ni explicar. Depende del modelo para todo.</p></div>
+      <div class="big c3 a-pop" style="--d:2.4s;text-align:center;font-size:80px">→</div>
+      <div class="card a-left" style="--d:3s"><h3 class="c1">Ingeniero de la era IA</h3>
+        <div class="bubble me">"Diseño así; genera la capa de datos con estos tests"</div>
+        <div class="bubble me">"Este diff rompe la transacción; corrígelo aquí"</div>
+        <p>Usa la IA como un equipo de juniors muy rápidos. Él es el arquitecto y el revisor.</p></div>
+    </div>
+    <div class="caps">
+      <p data-at="0.5">La diferencia entre un vibecoder y un ingeniero de la era de la IA no es cuánto código escribe cada uno. Es quién entiende lo que se está construyendo.</p>
+      <p data-at="10">El ingeniero diseña, especifica, revisa y responde por el resultado. La IA produce, él decide. Lo que sigue son los tres niveles que necesitas.</p>
+    </div>
+  </section>
+
+  <!-- 10 NIVEL 1 -->
+  <section class="scene" data-dur="38" data-name="Nivel 1: fundamentos">
+    <div class="lvl a-pop" style="--d:.3s"><b>1</b>Fundamentos</div>
+    <div class="tag a-up">Nivel 1</div>
+    <h2 class="a-up" style="--d:.2s;max-width:980px;font-size:34px">Lo que domina un estudiante de <span class="c2">tercer semestre</span></h2>
+    <div class="two" style="margin-top:10px">
+      <div class="list stagger" data-stagger="1,0.9" data-anim="up" style="margin-top:0;font-size:17px">
+        <div class="check"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="#a78bfa" stroke-width="2.5"/><path pathLength="1" class="a-draw" style="--d:1.5s" d="M9 17l6 6 10-12" fill="none" stroke="#a78bfa" stroke-width="3" stroke-linecap="round"/></svg><div><b>Un lenguaje a fondo, sin autocompletar.</b> Python o TypeScript: tipos, memoria, errores, módulos. Debes poder escribirlo desde cero.</div></div>
+        <div class="check"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="#a78bfa" stroke-width="2.5"/><path pathLength="1" class="a-draw" style="--d:2.4s" d="M9 17l6 6 10-12" fill="none" stroke="#a78bfa" stroke-width="3" stroke-linecap="round"/></svg><div><b>Estructuras de datos y Big-O.</b> Arreglos, hash maps, árboles, grafos, colas. Por qué O(n²) te mata en producción.</div></div>
+        <div class="check"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="#a78bfa" stroke-width="2.5"/><path pathLength="1" class="a-draw" style="--d:3.3s" d="M9 17l6 6 10-12" fill="none" stroke="#a78bfa" stroke-width="3" stroke-linecap="round"/></svg><div><b>Cómo funciona la máquina.</b> CPU, memoria, procesos, stack vs heap, qué pasa cuando corres tu programa.</div></div>
+        <div class="check"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="#a78bfa" stroke-width="2.5"/><path pathLength="1" class="a-draw" style="--d:4.2s" d="M9 17l6 6 10-12" fill="none" stroke="#a78bfa" stroke-width="3" stroke-linecap="round"/></svg><div><b>Terminal, Git real y HTTP.</b> Branches, rebase, bisect; cómo viaja un request de tu navegador al servidor.</div></div>
+        <div class="check"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="#a78bfa" stroke-width="2.5"/><path pathLength="1" class="a-draw" style="--d:5.1s" d="M9 17l6 6 10-12" fill="none" stroke="#a78bfa" stroke-width="3" stroke-linecap="round"/></svg><div><b>Depurar sin IA.</b> Leer un stack trace, poner breakpoints, reproducir el bug antes de tocarlo.</div></div>
+        <div class="check"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="#a78bfa" stroke-width="2.5"/><path pathLength="1" class="a-draw" style="--d:6s" d="M9 17l6 6 10-12" fill="none" stroke="#a78bfa" stroke-width="3" stroke-linecap="round"/></svg><div><b>Testing.</b> Unitarias e integración. Los tests son tu contrato con la IA: si no puedes verificar, no puedes delegar.</div></div>
+      </div>
+      <div class="a-up" style="--d:2.2s">
+        <div class="mono"><span class="m"># ¿puedes explicar por qué esto es O(n) y no O(n²)?</span><br><span class="p">def</span> <span class="y">primer_duplicado</span>(xs):<br>&nbsp;&nbsp;&nbsp;&nbsp;vistos = <span class="g">set</span>()<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="p">for</span> x <span class="p">in</span> xs:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="p">if</span> x <span class="p">in</span> vistos:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="p">return</span> x<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vistos.add(x)<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="p">return</span> <span class="g">None</span><br><br><span class="m"># ¿qué pasa si xs tiene 10 millones de elementos?</span><br><span class="m"># ¿y si cambias set() por una lista?</span></div>
+        <p class="a-up" style="--d:7s;color:var(--mute);font-size:17px;margin-top:10px">Si dudas, este nivel es tu prioridad. Equivale a los semestres 1 a 3: unas 400 horas de estudio real.</p>
+      </div>
+    </div>
+    <div class="caps">
+      <p data-at="0.5">Nivel uno: los fundamentos. Son exactamente lo que un estudiante domina al terminar tercer semestre, y es lo que la IA no puede hacer por ti porque es lo que te permite juzgarla.</p>
+      <p data-at="11">Un lenguaje a fondo, estructuras de datos con su costo, cómo funciona la máquina, terminal y Git, depurar sin ayuda y escribir pruebas.</p>
+      <p data-at="21">Mira el código de la derecha. Si no puedes explicar por qué es lineal y qué pasa si cambias el set por una lista, empieza aquí.</p>
+      <p data-at="30">Son unas cuatrocientas horas de estudio real. No es trivial, pero es finito.</p>
+    </div>
+  </section>
+
+  <!-- 11 NIVEL 2 -->
+  <section class="scene" data-dur="38" data-name="Nivel 2: ingeniería">
+    <div class="lvl a-pop" style="--d:.3s;border-color:var(--c3);color:var(--c3)"><b>2</b>Ingeniería</div>
+    <div class="tag a-up">Nivel 2</div>
+    <h2 class="a-up" style="--d:.2s;max-width:980px;font-size:34px">Lo que te hace <span class="c3">ingeniero</span>: sistemas, no scripts</h2>
+    <div class="grid2 stagger" data-stagger="1,0.8" data-anim="up" style="margin-top:10px">
+      <div class="check"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="#fbbf24" stroke-width="2.5"/><path pathLength="1" class="a-draw" style="--d:1.5s" d="M9 17l6 6 10-12" fill="none" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/></svg><div><b>Bases de datos de verdad.</b> Modelado, SQL sin ORM, índices, transacciones, por qué se corrompen los datos.</div></div>
+      <div class="check"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="#fbbf24" stroke-width="2.5"/><path pathLength="1" class="a-draw" style="--d:2.3s" d="M9 17l6 6 10-12" fill="none" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/></svg><div><b>Sistemas operativos y concurrencia.</b> Procesos, hilos, async, locks, race conditions. El 80 % de los bugs raros viven aquí.</div></div>
+      <div class="check"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="#fbbf24" stroke-width="2.5"/><path pathLength="1" class="a-draw" style="--d:3.1s" d="M9 17l6 6 10-12" fill="none" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/></svg><div><b>Redes y seguridad.</b> TLS, autenticación, OWASP Top 10, manejo de secretos. La IA genera vulnerabilidades con mucha confianza.</div></div>
+      <div class="check"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="#fbbf24" stroke-width="2.5"/><path pathLength="1" class="a-draw" style="--d:3.9s" d="M9 17l6 6 10-12" fill="none" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/></svg><div><b>Diseño de software.</b> Módulos, interfaces, acoplamiento, cuándo abstraer. Y leer código ajeno grande sin perderte.</div></div>
+      <div class="check"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="#fbbf24" stroke-width="2.5"/><path pathLength="1" class="a-draw" style="--d:4.7s" d="M9 17l6 6 10-12" fill="none" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/></svg><div><b>Arquitectura y nube.</b> Deploy, contenedores, colas, caché, observabilidad. Que tu sistema sobreviva a usuarios reales.</div></div>
+      <div class="check"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="#fbbf24" stroke-width="2.5"/><path pathLength="1" class="a-draw" style="--d:5.5s" d="M9 17l6 6 10-12" fill="none" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/></svg><div><b>La matemática que sí usas.</b> Discretas y lógica, probabilidad y estadística, álgebra lineal. Sin ellas la IA moderna es magia, no herramienta.</div></div>
+    </div>
+    <p class="a-up" style="--d:7s;color:var(--mute);font-size:18px;margin-top:12px">Equivale a los semestres 4 a 6. Aquí es donde la mayoría de los autodidactas se detiene, y por eso es donde más vale la pena insistir.</p>
+    <div class="caps">
+      <p data-at="0.5">Nivel dos: ingeniería. Es la diferencia entre escribir scripts y construir sistemas que otras personas usan y que no se caen.</p>
+      <p data-at="9">Bases de datos reales, concurrencia, redes y seguridad, diseño de software, arquitectura en la nube, y la matemática que sí usas: discretas, probabilidad y álgebra lineal.</p>
+      <p data-at="20">Esto corresponde a los semestres cuatro a seis. La mayoría de los autodidactas se detiene antes de llegar aquí.</p>
+      <p data-at="29">Por eso dominarlo es lo que te vuelve difícil de reemplazar.</p>
+    </div>
+  </section>
+
+  <!-- 12 NIVEL 3 -->
+  <section class="scene" data-dur="38" data-name="Nivel 3: era IA">
+    <div class="lvl a-pop" style="--d:.3s;border-color:var(--c4);color:var(--c4)"><b>3</b>Era IA</div>
+    <div class="tag a-up">Nivel 3</div>
+    <h2 class="a-up" style="--d:.2s;max-width:980px;font-size:34px">Lo que <span class="c4">ningún plan de estudios de 2019</span> tenía: trabajar con modelos</h2>
+    <div class="grid2 stagger" data-stagger="1,0.8" data-anim="up" style="margin-top:10px">
+      <div class="check"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="#34d399" stroke-width="2.5"/><path pathLength="1" class="a-draw" style="--d:1.5s" d="M9 17l6 6 10-12" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round"/></svg><div><b>Cómo funciona un LLM.</b> Tokens, ventana de contexto, embeddings, temperatura, por qué alucina y por qué no "sabe" nada.</div></div>
+      <div class="check"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="#34d399" stroke-width="2.5"/><path pathLength="1" class="a-draw" style="--d:2.3s" d="M9 17l6 6 10-12" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round"/></svg><div><b>Del prompt al sistema.</b> Tool use, agentes, RAG, memoria, orquestación. Un prompt es un prototipo; un sistema tiene evals.</div></div>
+      <div class="check"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="#34d399" stroke-width="2.5"/><path pathLength="1" class="a-draw" style="--d:3.1s" d="M9 17l6 6 10-12" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round"/></svg><div><b>Tú eres el revisor.</b> Lees cada diff que genera la IA, entiendes el "por qué", y respondes por él como si lo hubieras escrito.</div></div>
+      <div class="check"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="#34d399" stroke-width="2.5"/><path pathLength="1" class="a-draw" style="--d:3.9s" d="M9 17l6 6 10-12" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round"/></svg><div><b>Especificar bien.</b> Requerimientos claros, criterios de aceptación, tests primero. La calidad del output es la calidad de tu especificación.</div></div>
+      <div class="check"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="#34d399" stroke-width="2.5"/><path pathLength="1" class="a-draw" style="--d:4.7s" d="M9 17l6 6 10-12" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round"/></svg><div><b>Costo, latencia y riesgo.</b> Tokens por petición, caché, modelos pequeños vs grandes, prompt injection, privacidad de datos.</div></div>
+      <div class="check"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="#34d399" stroke-width="2.5"/><path pathLength="1" class="a-draw" style="--d:5.5s" d="M9 17l6 6 10-12" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round"/></svg><div><b>Evaluación.</b> Cómo sabes que tu agente funciona: datasets de prueba, métricas, regresiones. Sin evals, solo tienes vibes.</div></div>
+    </div>
+    <p class="a-up" style="--d:7s;color:var(--mute);font-size:18px;margin-top:12px">Este nivel no sustituye a los dos anteriores: los multiplica. Un revisor que no entiende concurrencia aprueba race conditions a la velocidad de la luz.</p>
+    <div class="caps">
+      <p data-at="0.5">Nivel tres: lo que la era de la IA agregó. Cómo funciona un modelo de lenguaje, cómo pasar de un prompt a un sistema con herramientas, agentes y recuperación de información.</p>
+      <p data-at="11">Y sobre todo, el cambio de rol: tú eres el revisor. Especificas, lees cada cambio, mides con evaluaciones y respondes por el resultado.</p>
+      <p data-at="21">Cuidado: este nivel no sustituye a los dos anteriores, los multiplica. Un revisor que no entiende concurrencia aprueba errores a la velocidad de la luz.</p>
+      <p data-at="31">Primero fundamentos, luego sistemas, luego IA.</p>
+    </div>
+  </section>
+
+  <!-- 13 ROADMAP -->
+  <section class="scene" data-dur="40" data-name="Plan a 3 años">
+    <div class="tag a-up">Tu plan a tres años</div>
+    <h2 class="a-up" style="--d:.2s;font-size:36px">10 h/semana × <span class="c1">3 años</span>: la carrera comprimida a lo esencial</h2>
+    <svg viewBox="0 0 1136 110" width="1136" height="110" style="margin-top:4px;overflow:visible">
+      <path pathLength="1" class="a-draw" style="--d:.8s" d="M40 70 H1096" stroke="#3b4a7a" stroke-width="8" stroke-linecap="round" fill="none"/>
+      <g font-weight="800" text-anchor="middle" font-size="20" fill="#fff">
+        <g class="a-pop" style="--d:1.4s;transform-box:fill-box;transform-origin:center"><circle cx="190" cy="70" r="26" fill="#a78bfa"/><text x="190" y="77" fill="#0b1020">1</text><text x="190" y="26" font-size="18">Año 1 · Fundamentos</text></g>
+        <g class="a-pop" style="--d:2.2s;transform-box:fill-box;transform-origin:center"><circle cx="568" cy="70" r="26" fill="#fbbf24"/><text x="568" y="77" fill="#0b1020">2</text><text x="568" y="26" font-size="18">Año 2 · Sistemas</text></g>
+        <g class="a-pop" style="--d:3s;transform-box:fill-box;transform-origin:center"><circle cx="946" cy="70" r="26" fill="#34d399"/><text x="946" y="77" fill="#0b1020">3</text><text x="946" y="26" font-size="18">Año 3 · Especialización + IA</text></g>
+      </g>
+    </svg>
+    <div class="cols" style="margin-top:0">
+      <div class="card a-up" style="--d:1.8s"><h3 class="c2">Año 1</h3><p>Curso base completo (CS50 o Nand2Tetris), estructuras de datos y algoritmos, Git y terminal. <b>Dos proyectos sin IA</b>, con tests, de inicio a fin.</p></div>
+      <div class="card a-up" style="--d:2.6s"><h3 class="c3">Año 2</h3><p>Sistemas operativos, redes, bases de datos, diseño de software. <b>Un producto en producción con usuarios reales</b> que despliegas y mantienes.</p></div>
+      <div class="card a-up" style="--d:3.4s"><h3 class="c4">Año 3</h3><p>Una especialidad (backend, IA aplicada, seguridad, datos). Open source, un agente con evals, <b>mentorear a alguien</b>.</p></div>
+    </div>
+    <div class="a-up" style="--d:5s;margin-top:12px;font-size:15px">
+      <span class="pill c1" style="background:rgba(34,211,238,.12);border-color:rgba(34,211,238,.4)">Señales de que ya eres "serio"</span>
+      <span class="stagger" data-stagger="5.6,0.5" data-anim="pop">
+        <span class="pill">Explicas el porqué, no solo el qué</span><span class="pill">Depuras sin IA</span><span class="pill">Diseñas antes de pedir código</span><span class="pill">Lees código ajeno grande</span><span class="pill">Estimas complejidad y costo</span><span class="pill">Shippeas y mantienes en producción</span><span class="pill">Detectas cuando la IA se equivoca</span>
+      </span></div>
+    <div class="caps">
+      <p data-at="0.5">El plan. Diez horas a la semana durante tres años son unas mil quinientas horas: un tercio de la carrera, pero concentrado en lo que de verdad usa un ingeniero.</p>
+      <p data-at="11">Año uno, fundamentos y dos proyectos sin IA. Año dos, sistemas y un producto real en producción. Año tres, una especialidad, open source, un agente con evaluaciones y mentorear a alguien.</p>
+      <p data-at="24">Sabrás que ya eres serio cuando explicas el porqué, depuras sin ayuda, diseñas antes de pedir código, y detectas cuando la IA se equivoca.</p>
+      <p data-at="34">Ese es el título que nadie te puede dar ni quitar.</p>
+    </div>
+  </section>
+
+  <!-- 14 CIERRE -->
+  <section class="scene" data-dur="18" data-name="Cierre">
+    <div style="padding-top:90px">
+      <div class="tag a-up">Cierre</div>
+      <p class="quote a-up" style="--d:.5s;margin:0">El título <span class="c2">certifica</span>. El conocimiento <span class="c1">se demuestra</span>.</p>
+      <p class="quote a-up" style="--d:2.2s;color:var(--mute);font-weight:500">En la era de la IA, lo que vale es lo que puedes <span class="c3">verificar</span>, <span class="c3">diseñar</span> y <span class="c3">sostener</span>.</p>
+      <div class="a-up" style="--d:4.2s;margin-top:40px">
+        <span class="pill c2">Nivel 1 · Fundamentos</span><span class="pill c3">Nivel 2 · Ingeniería</span><span class="pill c4">Nivel 3 · Era IA</span>
+      </div>
+      <p class="a-up" style="--d:6s;color:var(--mute);font-size:22px;margin-top:40px">Guarda este video. Vuelve en un año y marca lo que ya puedes hacer.</p>
+    </div>
+    <div class="caps">
+      <p data-at="0.5">El título certifica; el conocimiento se demuestra. No tendrás la ingeniería, pero puedes tener exactamente lo que la ingeniería enseña.</p>
+      <p data-at="9">Guarda este video. Vuelve en un año y marca lo que ya puedes hacer. Nos vemos en el nivel tres.</p>
+    </div>
+  </section>
+
+  <div id="cap"></div>
+</div>
+</div>
+
+<div id="ctl">
+  <button id="play">▶ Reproducir</button>
+  <button id="back" title="Capítulo anterior">⏮</button>
+  <button id="fwd" title="Siguiente capítulo">⏭</button>
+  <div id="prog"><div id="bar"></div></div>
+  <span id="time">0:00 / 0:00</span>
+  <label class="sw"><input type="checkbox" id="voice"> Narración por voz (navegador)</label>
+  <button id="full">⛶ Pantalla completa</button>
+</div>
+<div id="chaps"></div>
+
+<script>
+(function(){
+  const scenes=[...document.querySelectorAll('.scene')];
+  const durs=scenes.map(s=>+s.dataset.dur);
+  const starts=[];let acc=0;durs.forEach(d=>{starts.push(acc);acc+=d});
+  const TOTAL=acc;
+  const capEl=document.getElementById('cap'),bar=document.getElementById('bar'),timeEl=document.getElementById('time'),chapEl=document.getElementById('chap'),playBtn=document.getElementById('play'),chaps=document.getElementById('chaps');
+  const RENDER=new URLSearchParams(location.search).has('render');
+  if(RENDER) document.body.classList.add('render');
+
+  // stagger: asigna --d a hijos y clase de animación
+  document.querySelectorAll('.stagger').forEach(el=>{
+    const [base,step]=(el.dataset.stagger||'0,0.3').split(',').map(Number);
+    const cls='a-'+(el.dataset.anim||'up');
+    [...el.children].forEach((c,i)=>{c.classList.add(cls);c.style.setProperty('--d',(base+i*step).toFixed(2)+'s');});
+  });
+
+  let t=0,playing=false,last=0,cur=-1,lastCap='';
+  const fmt=s=>{s=Math.floor(s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+
+  scenes.forEach((s,k)=>{const b=document.createElement('button');b.textContent=(k+1)+'. '+s.dataset.name;b.onclick=()=>{render(starts[k]);};chaps.appendChild(b);});
+
+  function speak(txt){
+    if(!document.getElementById('voice').checked||!('speechSynthesis' in window)) return;
+    try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang='es-MX';u.rate=1.05;
+      const v=speechSynthesis.getVoices().find(v=>/^es[-_]?(MX|419|US)/i.test(v.lang))||speechSynthesis.getVoices().find(v=>/^es/i.test(v.lang));
+      if(v)u.voice=v;speechSynthesis.speak(u);}catch(e){}
+  }
+
+  function render(time){
+    t=Math.max(0,Math.min(TOTAL,time));
+    let i=durs.length-1;for(let k=0;k<durs.length;k++){if(t<starts[k]+durs[k]){i=k;break;}}
+    if(i!==cur){scenes.forEach((s,k)=>s.classList.toggle('active',k===i));cur=i;[...chaps.children].forEach((b,k)=>b.classList.toggle('on',k===i));}
+    const lt=t-starts[i];
+    for(const a of scenes[i].getAnimations({subtree:true})){a.currentTime=lt*1000;}
+    const caps=[...scenes[i].querySelectorAll('.caps p')];let c=null;for(const p of caps){if(+p.dataset.at<=lt)c=p;}
+    const txt=c?c.textContent:'';
+    if(txt!==lastCap){lastCap=txt;capEl.textContent=txt;capEl.classList.remove('show');void capEl.offsetWidth;capEl.classList.add('show');if(playing&&txt)speak(txt);}
+    bar.style.width=(t/TOTAL*100)+'%';timeEl.textContent=fmt(t)+' / '+fmt(TOTAL);
+    chapEl.innerHTML='Capítulo <b>'+(i+1)+'</b> / '+scenes.length+' · '+scenes[i].dataset.name;
+  }
+  function loop(now){
+    if(!playing)return;
+    const dt=Math.min(.1,(now-last)/1000);last=now;render(t+dt);
+    if(t>=TOTAL){playing=false;playBtn.textContent='↺ Repetir';speechSynthesis&&speechSynthesis.cancel();return;}
+    requestAnimationFrame(loop);
+  }
+  function play(){if(t>=TOTAL)t=0;playing=true;last=performance.now();playBtn.textContent='❚❚ Pausa';requestAnimationFrame(loop);}
+  function pause(){playing=false;playBtn.textContent='▶ Reproducir';if('speechSynthesis' in window)speechSynthesis.cancel();}
+  playBtn.onclick=()=>playing?pause():play();
+  document.getElementById('back').onclick=()=>{const i=cur>0&&(t-starts[cur])<2?cur-1:cur;render(starts[i]);};
+  document.getElementById('fwd').onclick=()=>{render(cur<scenes.length-1?starts[cur+1]:TOTAL);};
+  document.getElementById('prog').onclick=e=>{const r=e.currentTarget.getBoundingClientRect();render((e.clientX-r.left)/r.width*TOTAL);};
+  document.getElementById('full').onclick=()=>{(document.documentElement.requestFullscreen||function(){}).call(document.documentElement);};
+  document.getElementById('voice').onchange=e=>{if(!e.target.checked&&'speechSynthesis' in window)speechSynthesis.cancel();};
+  document.addEventListener('keydown',e=>{
+    if(e.code==='Space'){e.preventDefault();playing?pause():play();}
+    else if(e.code==='ArrowRight'){render(t+5);} else if(e.code==='ArrowLeft'){render(t-5);}
+  });
+  function fit(){
+    if(RENDER){document.getElementById('wrap').style.transform='none';return;}
+    const w=document.getElementById('wrap');const ctlH=document.getElementById('ctl').offsetHeight+document.getElementById('chaps').offsetHeight+48;
+    const s=Math.min((innerWidth-32)/1280,(innerHeight-ctlH)/720,1);
+    w.style.transform='scale('+s+')';w.style.width=1280+'px';w.style.height=720+'px';w.style.marginBottom=(720*s-720)+'px';w.style.marginRight=(1280*s-1280)+'px';
+  }
+  addEventListener('resize',fit);fit();
+  render(0);
+  window.__video={total:TOTAL,seek:s=>render(s),starts,durs};
+})();
+</script>
+</body>
+</html>
